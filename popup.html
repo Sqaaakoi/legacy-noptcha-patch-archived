@@ -1,0 +1,63 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="popup.css">
+    </head>
+    <body>
+        <div id="main">
+            <div class="settings_group">
+                <div class="label">Server Status</div>
+                <div id='server_status' class="value green">Online</div>
+            </div>
+            <hr>
+
+            <div class="settings_group">
+                <div class="label">Auto Solve</div>
+                <label class="switch">
+                    <input id="auto_solve" type="checkbox" data-disables="solve_delay,solve_method">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="settings_group">
+                <div class="label">Solve Delay <span class="light">(ms)</span></div>
+                <input id="solve_delay" type="text">
+            </div>
+
+            <div class="settings_group">
+                <div class="label">Auto Open</div>
+                <label class="switch">
+                    <input id="auto_open" type="checkbox" data-disables="open_delay">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="settings_group">
+                <div class="label">Open Delay <span class="light">(ms)</span></div>
+                <input id="open_delay" type="text">
+            </div>
+
+            <hr>
+            <div class="settings_group">
+                <div class="label">ReCAPTCHA Method</div>
+                <select id="solve_method">
+                    <option value="image" selected>Image</option>
+                    <option value="voice">Voice</option>
+                </select>
+            </div>
+
+            <!-- <hr>
+            <div class="settings_group">
+                <div class="label">Debug</div>
+                <label class="switch">
+                    <input id="debug" type="checkbox">
+                    <span class="slider"></span>
+                </label>
+            </div> -->
+
+            <div class="settings_group">
+                <div id="footer" class="clickable">bug report & feature request</div>
+            </div>
+        </div>
+        <script src="popup.js"></script>
+    </body>
+</html>

@@ -1,0 +1,49 @@
+{
+   "action": {
+      "default_icon": "icon/16.png",
+      "default_popup": "popup.html",
+      "default_title": "Noptcha: ReCAPTCHA & hCAPTCHA Solver"
+   },
+   "background": {
+      "service_worker": "background.js"
+   },
+   "content_scripts": [ {
+      "all_frames": true,
+      "js": [ "hcaptcha.js" ],
+      "matches": [ "*://*.hcaptcha.com/captcha/*" ],
+      "run_at": "document_end"
+   }, {
+      "all_frames": true,
+      "js": [ "hcaptcha_fast.js" ],
+      "matches": [ "*://*.hcaptcha.com/captcha/*" ],
+      "run_at": "document_start"
+   }, {
+      "all_frames": true,
+      "js": [ "recaptcha.js", "recaptcha_voice.js" ],
+      "matches": [ "\u003Call_urls>" ],
+      "run_at": "document_end"
+   }, {
+      "all_frames": true,
+      "js": [ "recaptcha_fast.js" ],
+      "matches": [ "*://*.google.com/recaptcha/*", "*://*.recaptcha.net/recaptcha/*", "*://recaptcha.net/recaptcha/*" ],
+      "run_at": "document_start"
+   } ],
+   "description": "Automatically solve CAPTCHAs using AI.",
+   "host_permissions": [ "\u003Call_urls>" ],
+   "icons": {
+      "128": "icon/128.png",
+      "16": "icon/16.png",
+      "32": "icon/32.png",
+      "48": "icon/48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlWiyXSK0GK0nDwOfOJ2zUvRv99E2XU6LnR67zKE5RjM2icff7Cwmo6nR5i+4UukShIyEaDdQsbC+vyTpDeaJMn+bNphPYjQxGY6spIk3KV1h71Jj0dSUOYUwGrViKg3LnC4LKtENYOsbIxTmMw8JG4oH1hU1tY4KlnSzcqiwTaDLTP0X7MVdDK0WPOyypNlkL7v1HWMjPZa32EudqcrWub/EMpMFuSugTyIu8dHaAQhW13RkU77BiMRoZfZYxbcED48YPmZS8qi3KOrymjOTWCJeDMjwy/MLCqrwhjoG1Y5jDXHFbxNUPxEJYw9mxxPTN+asraML9tywlLuzZluHwwIDAQAB",
+   "manifest_version": 3,
+   "name": "Noptcha: ReCAPTCHA & hCAPTCHA Solver",
+   "permissions": [ "storage", "scripting", "declarativeNetRequest", "webRequest" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "0.1.8",
+   "web_accessible_resources": [ {
+      "matches": [ "\u003Call_urls>" ],
+      "resources": [ "utils.js" ]
+   } ]
+}
