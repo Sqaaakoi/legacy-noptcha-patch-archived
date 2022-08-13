@@ -216,7 +216,8 @@
         static checking_status = false;
         static async run_status_check() {
             return setInterval(()=>{
-                check_status()
+                // For some reason, this causes an error without defining the class name????
+                ServerStatus.check_status()
             }
             , ServerStatus.STATUS_CHECK_INTERVAL),
             true
