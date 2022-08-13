@@ -44,12 +44,15 @@ html, body {
 .clickable:hover {
     opacity: 0.8;
 }
+.disclaimer {
+    font-weight: 600;
+}
 
 #main {
     padding: 8px 16px;
 }
 
-#footer {
+.footer {
     margin-top: 8px;
     width: 100%;
     text-align: center;

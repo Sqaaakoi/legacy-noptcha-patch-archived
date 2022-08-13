@@ -64,9 +64,11 @@ async function set_select(e, t) {
 }
 async function main() {
     document.querySelector("#footer").addEventListener("click", async () => {
-        await BG.exec("open_tab", {
-            url: "https://discord.gg/gpudrops"
-        })
+        if (confirm("Warning: You're using a modified version of this extension with affiliate tracking removed, and it might not be completely up to date. Would you still like to continue to \"discord.gg/gpudrops\" for support?")) {
+            await BG.exec("open_tab", {
+                url: "https://discord.gg/gpudrops"
+            })
+        }
     }
     );
     var e = await BG.exec("get_settings");
@@ -81,7 +83,7 @@ async function main() {
         c.addEventListener("input", () => set_field(c.id, c.value));
     for (const o of document.querySelectorAll(".settings_group select"))
         o.addEventListener("change", () => set_select(o.id, o.value));
-    async function t() {
+    async function queryServerStatus() {
         var e = await BG.exec("get_server_status");
         if (["Online", "Offline", "Slow", "Update Required"].includes(e)) {
             const t = document.querySelector("#server_status");
@@ -92,7 +94,7 @@ async function main() {
                 "Online" === e ? t.classList.add("green") : "Offline" === e ? t.classList.add("red") : "Slow" !== e && "Update Required" !== e || t.classList.add("yellow")
         }
     }
-    await t(),
-        setInterval(t, 1e3)
+    await queryServerStatus(),
+        setInterval(queryServerStatus, 1e3)
 }
 document.addEventListener("DOMContentLoaded", main);

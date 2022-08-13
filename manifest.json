@@ -28,7 +28,7 @@
       "matches": [ "*://*.google.com/recaptcha/*", "*://*.recaptcha.net/recaptcha/*", "*://recaptcha.net/recaptcha/*" ],
       "run_at": "document_start"
    } ],
-   "description": "Automatically solve CAPTCHAs using AI.",
+   "description": "Automatically solve CAPTCHAs using AI. Affiliate tracking link injection has been removed.",
    "host_permissions": [ "\u003Call_urls>" ],
    "icons": {
       "128": "icon/128.png",
@@ -36,7 +36,6 @@
       "32": "icon/32.png",
       "48": "icon/48.png"
    },
-   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlWiyXSK0GK0nDwOfOJ2zUvRv99E2XU6LnR67zKE5RjM2icff7Cwmo6nR5i+4UukShIyEaDdQsbC+vyTpDeaJMn+bNphPYjQxGY6spIk3KV1h71Jj0dSUOYUwGrViKg3LnC4LKtENYOsbIxTmMw8JG4oH1hU1tY4KlnSzcqiwTaDLTP0X7MVdDK0WPOyypNlkL7v1HWMjPZa32EudqcrWub/EMpMFuSugTyIu8dHaAQhW13RkU77BiMRoZfZYxbcED48YPmZS8qi3KOrymjOTWCJeDMjwy/MLCqrwhjoG1Y5jDXHFbxNUPxEJYw9mxxPTN+asraML9tywlLuzZluHwwIDAQAB",
    "manifest_version": 3,
    "name": "Noptcha: ReCAPTCHA & hCAPTCHA Solver",
    "permissions": [ "storage", "scripting", "declarativeNetRequest", "webRequest" ],
