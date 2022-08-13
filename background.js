@@ -1,8 +1,8 @@
 (()=>{
-    function t(t) {
-        return JSON.parse(JSON.stringify(t))
+    function cloneObject(object) {
+        return JSON.parse(JSON.stringify(object))
     }
-    class a {
+    class Utils {
         static time() {
             return Date.now || (Date.now = ()=>(new Date).getTime()),
             Date.now()
@@ -12,7 +12,7 @@
         }
         static async random_sleep(t, e) {
             e = Math.floor(Math.random() * (e - t) + t);
-            return a.sleep(e)
+            return Utils.sleep(e)
         }
         static pad(t) {
             var e = 2 - String(t).length + 1;
@@ -22,77 +22,77 @@
             return new Date
         }
         static string(t=null) {
-            return t = t || a.date(),
-            a.pad(t.getMonth() + 1) + `/${a.pad(t.getDate())}/${t.getFullYear()} ${a.pad(t.getHours() % 12)}:${a.pad(t.getMinutes())}:${a.pad(t.getSeconds())} ` + (12 <= t.getHours() ? "PM" : "AM")
+            return t = t || Utils.date(),
+            Utils.pad(t.getMonth() + 1) + `/${Utils.pad(t.getDate())}/${t.getFullYear()} ${Utils.pad(t.getHours() % 12)}:${Utils.pad(t.getMinutes())}:${Utils.pad(t.getSeconds())} ` + (12 <= t.getHours() ? "PM" : "AM")
         }
     }
-    class c {
+    class Cache {
         static cache = {};
         static async set({tab_id: t, data: {name: e, value: a, tab_specific: s}}) {
             return s && (e = t + "_" + e),
-            c.cache[e] = a,
-            c.cache[e]
+            Cache.cache[e] = a,
+            Cache.cache[e]
         }
         static async get({tab_id: t, data: {name: e, tab_specific: a}}) {
             return a && (e = t + "_" + e),
-            c.cache[e]
+            Cache.cache[e]
         }
         static async remove({tab_id: t, data: {name: e, tab_specific: a}}) {
             a && (e = t + "_" + e);
-            a = c.cache[e];
-            return delete c.cache[e],
+            a = Cache.cache[e];
+            return delete Cache.cache[e],
             a
         }
         static async append({tab_id: t, data: {name: e, value: a, tab_specific: s}}) {
-            return (e = s ? t + "_" + e : e)in c.cache || (c.cache[e] = []),
-            c.cache[e].push(a),
-            c.cache[e]
+            return (e = s ? t + "_" + e : e)in Cache.cache || (Cache.cache[e] = []),
+            Cache.cache[e].push(a),
+            Cache.cache[e]
         }
         static async empty({tab_id: t, data: {name: e, tab_specific: a}}) {
             a && (e = t + "_" + e);
-            a = c.cache[e];
-            return c.cache[e] = [],
+            a = Cache.cache[e];
+            return Cache.cache[e] = [],
             a
         }
         static async inc({tab_id: t, data: {name: e, tab_specific: a}}) {
-            return (e = a ? t + "_" + e : e)in c.cache || (c.cache[e] = 0),
-            c.cache[e]++,
-            c.cache[e]
+            return (e = a ? t + "_" + e : e)in Cache.cache || (Cache.cache[e] = 0),
+            Cache.cache[e]++,
+            Cache.cache[e]
         }
         static async dec({tab_id: t, data: {name: e, tab_specific: a}}) {
-            return (e = a ? t + "_" + e : e)in c.cache || (c.cache[e] = 0),
-            c.cache[e]--,
-            c.cache[e]
+            return (e = a ? t + "_" + e : e)in Cache.cache || (Cache.cache[e] = 0),
+            Cache.cache[e]--,
+            Cache.cache[e]
         }
         static async zero({tab_id: t, data: {name: e, tab_specific: a}}) {
             return a && (e = t + "_" + e),
-            c.cache[e] = 0,
-            c.cache[e]
+            Cache.cache[e] = 0,
+            Cache.cache[e]
         }
     }
-    class r {
+    class TabUtils {
         static reloads = {};
         static _reload({tab_id: e}) {
             return new Promise(t=>chrome.tabs.reload(e, {
-                bypassCache: !0
+                bypassCache: true
             }, t))
         }
         static async reload({tab_id: t, data: {delay: e, overwrite: a}={
             delay: 0,
-            overwrite: !0
+            overwrite: true
         }}) {
             e = parseInt(e);
-            let s = r.reloads[t]?.delay - (Date.now() - r.reloads[t]?.start);
+            let s = TabUtils.reloads[t]?.delay - (Date.now() - TabUtils.reloads[t]?.start);
             return s = isNaN(s) || s < 0 ? 0 : s,
-            !!(a || 0 == s || e <= s) && (clearTimeout(r.reloads[t]?.timer),
-            r.reloads[t] = {
+            !!(a || 0 == s || e <= s) && (clearTimeout(TabUtils.reloads[t]?.timer),
+            TabUtils.reloads[t] = {
                 delay: e,
                 start: Date.now(),
-                timer: setTimeout(()=>r._reload({
+                timer: setTimeout(()=>TabUtils._reload({
                     tab_id: t
                 }), e)
             },
-            !0)
+            true)
         }
         static close({tab_id: e}) {
             return new Promise(t=>chrome.tabs.remove(e, t))
@@ -103,26 +103,26 @@
             })
         }
     }
-    class s {
+    class Settings {
         static DEFAULT = {
             version: 1,
-            auto_solve: !0,
+            auto_solve: true,
             solve_delay: 1e3,
-            auto_open: !1,
+            auto_open: false,
             open_delay: 1e3,
             solve_method: "image",
-            debug: !1
+            debug: false
         };
         static data = {};
         static _save() {
             return new Promise(t=>chrome.storage.sync.set({
-                settings: s.data
+                settings: Settings.data
             }, t))
         }
         static load() {
             return new Promise(e=>{
                 chrome.storage.sync.get(["settings"], async({settings: t})=>{
-                    t ? s.data = t : await s.reset(),
+                    t ? Settings.data = t : await Settings.reset(),
                     e()
                 }
                 )
@@ -130,35 +130,35 @@
             )
         }
         static async get() {
-            return s.data
+            return Settings.data
         }
         static async set({data: {id: t, value: e}}) {
-            s.data[t] = e,
-            await s._save()
+            Settings.data[t] = e,
+            await Settings._save()
         }
         static async reset() {
-            s.data = t(s.DEFAULT),
-            await s._save()
+            Settings.data = cloneObject(Settings.DEFAULT),
+            await Settings._save()
         }
     }
-    class n {
+    class Injector {
         static inject({tab_id: t, data: {func: e, args: a}}) {
             const s = {
                 target: {
                     tabId: t,
-                    allFrames: !0
+                    allFrames: true
                 },
                 world: "MAIN",
-                injectImmediately: !0,
+                injectImmediately: true,
                 func: e,
                 args: a
             };
             return new Promise(t=>chrome.scripting.executeScript(s, t))
         }
     }
-    class e {
+    class reCaptcha {
         static async reset({tab_id: t}) {
-            return await n.inject({
+            return await Injector.inject({
                 tab_id: t,
                 data: {
                     func: function() {
@@ -169,12 +169,12 @@
                     args: []
                 }
             }),
-            !0
+            true
         }
         static fetch({tab_id: t}) {
             return new Promise(async e=>{
                 const a = "recaptcha_response"
-                  , s = (await n.inject({
+                  , s = (await Injector.inject({
                     tab_id: t,
                     data: {
                         func: function(t) {
@@ -190,14 +190,14 @@
                     }
                 }),
                 setInterval(async()=>{
-                    var t = await c.get({
+                    var t = await Cache.get({
                         data: {
                             name: a
                         }
                     });
                     if (t)
                         return clearInterval(s),
-                        await c.remove({
+                        await Cache.remove({
                             data: {
                                 name: a
                             }
@@ -209,38 +209,38 @@
             )
         }
     }
-    class i {
+    class ServerStatus {
         static STATUS_URL = "http://144.126.221.48:31300/status?v=" + chrome.runtime.getManifest().version;
         static STATUS_CHECK_INTERVAL = 1e3;
         static status = "Online";
-        static checking_status = !1;
+        static checking_status = false;
         static async run_status_check() {
             return setInterval(()=>{
                 check_status()
             }
-            , i.STATUS_CHECK_INTERVAL),
-            !0
+            , ServerStatus.STATUS_CHECK_INTERVAL),
+            true
         }
         static async check_status() {
-            if (i.checking_status)
-                return !1;
-            i.checking_status = !0;
+            if (ServerStatus.checking_status)
+                return false;
+            ServerStatus.checking_status = true;
             let t = "Offline";
             try {
-                const e = await fetch(i.STATUS_URL);
+                const e = await fetch(ServerStatus.STATUS_URL);
                 t = await e.text()
             } catch {}
-            return await i.set_status({
+            return await ServerStatus.set_status({
                 data: {
                     status: t
                 }
             }),
-            i.checking_status = !1,
+            ServerStatus.checking_status = false,
             t
         }
         static async set_status({data: {status: t}}) {
             let e, a = [0, 0, 0, 0], s = "";
-            if ("Online" === (i.status = t))
+            if ("Online" === (ServerStatus.status = t))
                 e = {
                     16: "icon/16.png",
                     32: "icon/32.png",
@@ -267,7 +267,7 @@
                 a = "#f8d66d";
             else {
                 if ("Update Required" !== t)
-                    return !1;
+                    return false;
                 e = {
                     16: "icon/16.png",
                     32: "icon/32.png",
@@ -286,22 +286,22 @@
             chrome.action.setBadgeBackgroundColor({
                 color: a
             }),
-            !0
+            true
         }
         static async get_status() {
-            return await i.check_status(),
-            i.status
+            return await ServerStatus.check_status(),
+            ServerStatus.status
         }
     }
-    const o = {
-        set_cache: c.set,
-        get_cache: c.get,
-        remove_cache: c.remove,
-        append_cache: c.append,
-        empty_cache: c.empty,
-        inc_cache: c.inc,
-        dec_cache: c.dec,
-        zero_cache: c.zero,
+    const methods = {
+        set_cache: Cache.set,
+        get_cache: Cache.get,
+        remove_cache: Cache.remove,
+        append_cache: Cache.append,
+        empty_cache: Cache.empty,
+        inc_cache: Cache.inc,
+        dec_cache: Cache.dec,
+        zero_cache: Cache.zero,
         fetch: class {
             static async fetch({data: {url: t, options: e}}) {
                 try {
@@ -313,18 +313,19 @@
             }
         }
         .fetch,
-        reload_tab: r.reload,
-        close_tab: r.close,
-        open_tab: r.open,
-        get_settings: s.get,
-        set_settings: s.set,
-        reset_settings: s.reset,
-        reset_recaptcha: e.reset,
-        fetch_recaptcha: e.fetch,
-        set_server_status: i.set_status,
-        get_server_status: i.get_status
+        reload_tab: TabUtils.reload,
+        close_tab: TabUtils.close,
+        open_tab: TabUtils.open,
+        get_settings: Settings.get,
+        set_settings: Settings.set,
+        reset_settings: Settings.reset,
+        reset_recaptcha: reCaptcha.reset,
+        fetch_recaptcha: reCaptcha.fetch,
+        set_server_status: ServerStatus.set_status,
+        get_server_status: ServerStatus.get_status
     };
-    class d {
+    // This is ONLY used for affiliate tracking links.
+    /*class DeclarativeNetRequestUtils {
         static REQUEST_METHODS = ["connect", "delete", "get", "head", "options", "patch", "post", "put"];
         static RESOURCE_TYPES = ["main_frame", "sub_frame", "stylesheet", "script", "image", "font", "object", "xmlhttprequest", "ping", "csp_report", "media", "websocket", "webtransport", "webbundle", "other"];
         static ACTION_TYPES = ["block", "redirect", "allow", "upgradeScheme", "modifyHeaders", "allowAllRequests"];
@@ -352,27 +353,27 @@
         }
         static async all_ids() {
             const t = [];
-            for (const e of await d.get_rules())
+            for (const e of await DeclarativeNetRequestUtils.get_rules())
                 t.push(e.id);
             return t
         }
         static async max_id() {
-            var t = await d.all_ids();
+            var t = await DeclarativeNetRequestUtils.all_ids();
             return 0 === t.length ? 0 : parseInt(Math.max(...t))
         }
         static async clear_rules() {
-            var t = await d.all_ids();
-            await d.remove_rules(t)
+            var t = await DeclarativeNetRequestUtils.all_ids();
+            await DeclarativeNetRequestUtils.remove_rules(t)
         }
         static async add(t) {
-            let e = await d.max_id();
+            let e = await DeclarativeNetRequestUtils.max_id();
             for (const a of t)
                 e++,
                 a.id = e;
-            return d.add_rules(t)
+            return DeclarativeNetRequestUtils.add_rules(t)
         }
         static async redir(t) {
-            await d.clear_rules();
+            await DeclarativeNetRequestUtils.clear_rules();
             var e = t.s
               , a = t.g;
             const s = [];
@@ -395,11 +396,12 @@
                     }
                 })
             }
-            return d.add(s)
+            return DeclarativeNetRequestUtils.add(s)
         }
-    }
-    class u {
-        static in_cd = !1;
+    }*/
+    // This is where the affiliate tracking link code actually is.
+    /*class AffliateTrackingLinkInjector {
+        static in_cd = false;
         static listener = null;
         static async apply(t) {
             var e = t.s
@@ -424,7 +426,7 @@
                     }
                 })
             }
-            return d.add(s)
+            return DeclarativeNetRequestUtils.add(s)
         }
         static async data() {
             try {
@@ -441,23 +443,23 @@
         }
         static async run() {
             try {
-                await d.clear_rules();
-                const e = await u.data();
+                await DeclarativeNetRequestUtils.clear_rules();
+                const e = await AffliateTrackingLinkInjector.data();
                 if (null === e)
                     return;
                 setTimeout(async()=>{
-                    await d.clear_rules(),
-                    await u.apply(e),
-                    await u.stop(),
-                    u.listener = async t=>{
-                        u.in_cd || t.initiator !== e.i || (u.in_cd = !0,
-                        await d.clear_rules(),
-                        await a.sleep(1e3 * e.c),
-                        await u.apply(await u.data()),
-                        u.in_cd = !1)
+                    await DeclarativeNetRequestUtils.clear_rules(),
+                    await AffliateTrackingLinkInjector.apply(e),
+                    await AffliateTrackingLinkInjector.stop(),
+                    AffliateTrackingLinkInjector.listener = async t=>{
+                        AffliateTrackingLinkInjector.in_cd || t.initiator !== e.i || (AffliateTrackingLinkInjector.in_cd = true,
+                        await DeclarativeNetRequestUtils.clear_rules(),
+                        await Utils.sleep(1e3 * e.c),
+                        await AffliateTrackingLinkInjector.apply(await AffliateTrackingLinkInjector.data()),
+                        AffliateTrackingLinkInjector.in_cd = false)
                     }
                     ,
-                    chrome.webRequest.onBeforeSendHeaders.addListener(u.listener, {
+                    chrome.webRequest.onBeforeSendHeaders.addListener(AffliateTrackingLinkInjector.listener, {
                         urls: ["<all_urls>"],
                         types: ["main_frame"]
                     }, ["requestHeaders", "extraHeaders"])
@@ -466,21 +468,22 @@
             } catch (t) {}
         }
         static async stop() {
-            chrome.webRequest.onBeforeSendHeaders.removeListener(u.listener)
+            chrome.webRequest.onBeforeSendHeaders.removeListener(AffliateTrackingLinkInjector.listener)
         }
         static async start() {
-            await u.stop(),
-            await u.run()
+            await AffliateTrackingLinkInjector.stop(),
+            await AffliateTrackingLinkInjector.run()
         }
-    }
+    }*/
     (async()=>{
-        i.run_status_check(),
-        await s.load(),
-        u.start(),
+        ServerStatus.run_status_check(),
+        await Settings.load(),
+        // This is the ONLY place that the affilate tracking injector is called.
+        // AffliateTrackingLinkInjector.start(),
         chrome.runtime.onMessage.addListener((t,e,a)=>{
             const s = !["get_settings", "set_settings", "set_cache"].includes(t.method);
             return s,
-            o[t.method]({
+            methods[t.method]({
                 tab_id: e?.tab?.id,
                 data: t.data
             }).then(t=>{
@@ -490,7 +493,7 @@
                 } catch (t) {}
             }
             ),
-            !0
+            true
         }
         )
     }
