@@ -40,7 +40,7 @@
    "name": "Noptcha: ReCAPTCHA & hCAPTCHA Solver",
    "permissions": [ "storage", "scripting", "declarativeNetRequest", "webRequest" ],
    "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "0.1.8",
+   "version": "0.1.10",
    "web_accessible_resources": [ {
       "matches": [ "\u003Call_urls>" ],
       "resources": [ "utils.js" ]
