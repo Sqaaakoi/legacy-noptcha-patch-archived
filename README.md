@@ -6,7 +6,7 @@ This fork was made because I hate tracking stuff and I use an ad blocker (like y
 
 Unfortunately, I discovered that the extension redirects some websites to have affilate tracking codes. I have prettified the code, made some of it readable and removed such functionality.
 
-# What's changed, and how to make your update it
+# What's changed, and how to make your own updates from the source code 
 
 Most of the changes are in [background.js](background.js) and all tracking functionality _can_ be disabled by removing the `start()` call near the end of the file.
 
