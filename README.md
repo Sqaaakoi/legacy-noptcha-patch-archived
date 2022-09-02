@@ -10,6 +10,8 @@ Unfortunately, I discovered that the extension redirects some websites to have a
 
 Most of the changes are in [background.js](background.js) and all tracking functionality _can_ be disabled by removing the `start()` call near the end of the file.
 
+# I didn't really make this and instead stole it
+
 None of the original code in here belongs to me.
 
 **No warranty or guarantee is provided that this extension will function or be updated.**
