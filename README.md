@@ -1,19 +1,17 @@
-# Noptcha, without affiliate link injection
+# TL;DR of below
 
-Noptcha is a reCaptcha and hCaptcha solving extension created by GPU Drops.
+## This is (probably) dead.
 
-This fork was made because I hate tracking stuff and I use an ad blocker (like you should on the modern internet) and also hate captchas, but I don't really want people over at GPU Drops to profit off me using their AI captcha solver.
+This repository is now archived due to GPU Drops making their service and official extension less sketchy, and a paid subscription with a free daily quota. Use a VPN to bypass that quota.
 
-Unfortunately, I discovered that the extension redirects some websites to have affilate tracking codes. I have prettified the code, made some of it readable and removed such functionality.
+# Long version
 
-# What's changed, and how to make your own updates from the source code 
+GPU Drops have unfortunately decided that captcha solving is profitable, just as much as selling a captcha service.
 
-Most of the changes are in [background.js](background.js) and all tracking functionality _can_ be disabled by removing the `start()` call near the end of the file.
+The service has been converted to a subscription model, with a free 50 captchas per day per IP address limit.
 
-# I didn't really make this and instead stole it
+I currently cannot see any way to bypass this. I'd also like to quickly note that the servers can and do IP ban for trying to screw around with subscription license keys. Please migrate back to the source extension as I feel it is safe to use without any affiliate link injection.
 
-None of the original code in here belongs to me.
+While writing this, I have noticed the original extension is now available on [GitHub](https://github.com/NopeCHA/NopeCHA). If you want to continue using the extension, go to that repository instead or visit [nopecha.com](https://nopecha.com/) for more information on their paid subscriptions (I doubt people from this repository will buy such subscriptions though).
 
-**No warranty or guarantee is provided that this extension will function or be updated.**
-
-[Original extension](https://chrome.google.com/webstore/detail/noptcha-recaptcha-hcaptch/dknlfmjaanfblgfdfebhijalfmhmjjjo)
+**I'd suggest just using a VPN to bypass the daily limit - you're probably going to need a VPN for using (abusing??) the services that have CAPTCHAs on them anyway as you're probably needing this to make a lot of accounts or something.**
