@@ -1,164 +1,267 @@
-(async () => {
-  const s = 'http://144.126.221.48:31300',
-    d = [400, 450],
-    { Logger: e, Time: m, BG: f, Net: o, Image: h } = await import(
-      chrome.runtime.getURL('utils.js')
-    )
-  async function w ({ task: e, task_img: t, images: a }) {
-    for (; 'Online' !== (await f.exec('get_server_status')); )
-      await m.sleep(1e3)
-    var r = {
-        y: 'h',
-        j: 'c',
-        i: a,
-        g: 1,
-        t: e,
-        a: t,
-        v: chrome.runtime.getManifest().version
-      },
-      r = await o.fetch(s, { method: 'POST', body: JSON.stringify(r) })
-    try {
-      var i = JSON.parse(r)
-      if ('error' in i)
-        return 13 === i.error
-          ? (await m.sleep(1e3), await w({ task: e, task_img: t, images: a }))
-          : (10 === i.error
-              ? await u()
-              : 14 === i.error &&
-                (await f.exec('set_server_status', { status: 'Slow' })),
-            { job_id: null, clicks: null })
-      else {
-        var c = i.data
-        for (;;) {
-          await m.sleep(1e3)
-          var n = await o.fetch(s + '?id=' + c)
-          try {
-            var l = JSON.parse(n)
-            if ('error' in l) {
-              if (12 != l.error) return await { job_id: c, clicks: null }
+;(async () => {
+  class d {
+    static time () {
+      return Date.now || (Date.now = () => new Date().getTime()), Date.now()
+    }
+    static sleep (t = 1e3) {
+      return new Promise(e => setTimeout(e, t))
+    }
+    static async random_sleep (e, t) {
+      t = Math.floor(Math.random() * (t - e) + e)
+      return d.sleep(t)
+    }
+    static pad (e) {
+      var t = 2 - String(e).length + 1
+      return 0 < t ? '' + new Array(t).join('0') + e : '' + e
+    }
+    static date () {
+      return new Date()
+    }
+    static string (e = null) {
+      return (
+        (e = e || d.date()),
+        d.pad(e.getMonth() + 1) +
+          `/${d.pad(e.getDate())}/${e.getFullYear()} ${d.pad(
+            e.getHours() % 12
+          )}:${d.pad(e.getMinutes())}:${d.pad(e.getSeconds())} ` +
+          (12 <= e.getHours() ? 'PM' : 'AM')
+      )
+    }
+  }
+  class p {
+    static exec (e, a) {
+      return new Promise(t => {
+        try {
+          chrome.runtime.sendMessage({ method: e, data: a }, t)
+        } catch (e) {
+          t()
+        }
+      })
+    }
+  }
+  class h {
+    static async fetch (e, t) {
+      return p.exec('fetch', { url: e, options: t })
+    }
+  }
+  class g {
+    static INFERENCE_URL = 'https://api.nopecha.com'
+    static MAX_WAIT_POST = 60
+    static MAX_WAIT_GET = 60
+    static ERRORS = {
+      UNKNOWN: 9,
+      INVALID_REQUEST: 10,
+      RATE_LIIMTED: 11,
+      BANNED_USER: 12,
+      NO_JOB: 13,
+      INCOMPLETE_JOB: 14,
+      INVALID_KEY: 15,
+      NO_CREDIT: 16,
+      UPDATE_REQUIRED: 17
+    }
+    static async post ({
+      captcha_type: e,
+      task: t,
+      image_urls: a,
+      grid: r,
+      key: n
+    }) {
+      for (
+        var i = Date.now(), c = await p.exec('info_tab');
+        !(Date.now() - i > 1e3 * g.MAX_WAIT_POST);
+
+      ) {
+        const u = {
+          type: e,
+          task: t,
+          image_urls: a,
+          v: chrome.runtime.getManifest().version,
+          key: n,
+          url: c.url
+        }
+        r && (u.grid = r)
+        var o = await h.fetch(g.INFERENCE_URL, {
+          method: 'POST',
+          body: JSON.stringify(u),
+          headers: { 'Content-Type': 'application/json' }
+        })
+        try {
+          var s = JSON.parse(o)
+          if ('error' in s) {
+            if (s.error === g.ERRORS.RATE_LIMITED) {
+              await d.sleep(2e3)
               continue
             }
-            return await { job_id: c, clicks: l.data }
-          } catch (e) {}
+            if (s.error === g.ERRORS.INVALID_KEY) break
+            if (s.error === g.ERRORS.NO_CREDIT) break
+            break
+          }
+          var l = 'id' in s ? s.id : s.data
+          return await g.get({ job_id: l, key: n })
+        } catch (e) {
+          break
         }
-        return await void 0
       }
-    } catch (e) {
-      await u()
+      return { job_id: null, clicks: null }
     }
-    return { job_id: null, clicks: null }
+    static async get ({ key: e, job_id: t }) {
+      for (var a = Date.now(); !(Date.now() - a > 1e3 * g.MAX_WAIT_GET); ) {
+        await d.sleep(500)
+        var r = await h.fetch(g.INFERENCE_URL + `?id=${t}&key=` + e)
+        try {
+          var n = JSON.parse(r)
+          if ('error' in n) {
+            if (n.error !== g.ERRORS.INCOMPLETE_JOB)
+              return { job_id: t, clicks: null }
+            continue
+          }
+          return { job_id: t, clicks: n.data }
+        } catch (e) {
+          break
+        }
+      }
+      return { job_id: t, clicks: null }
+    }
   }
-  async function u () {
-    await f.exec('set_server_status', { status: 'Offline' })
-  }
-  function g (e) {
-    const t = e.style.background?.trim()?.match(/(?!^)".*?"/g)
+  function u (e) {
+    const t = e?.style.background?.trim()?.match(/(?!^)".*?"/g)
     return t && 0 !== t.length ? t[0].replaceAll('"', '') : null
   }
-  let p = null
-  async function _ () {
-    if (e.debug) {
-      let e = await f.exec('get_cache', { name: 'hcaptcha_pass' }),
-        t = await f.exec('get_cache', { name: 'hcaptcha_fail' })
-      null === e && (e = 0), null === t && (t = 0)
-      0 < e + t && Math.round((100 * e) / (e + t))
+  async function y () {
+    let e = document
+      .querySelector('h2.prompt-text')
+      ?.innerText?.replace(/\s+/g, ' ')
+      ?.trim()
+    if (!e) return null
+    var t = {
+      '0430': 'a',
+      '0441': 'c',
+      '0501': 'd',
+      '0435': 'e',
+      '04bb': 'h',
+      '0456': 'i',
+      '0458': 'j',
+      '04cf': 'l',
+      '03bf': 'o',
+      '043e': 'o',
+      '0440': 'p',
+      '0455': 's',
+      '0445': 'x',
+      '0443': 'y',
+      '0065': 'e',
+      '0069': 'i',
+      '30fc': '一',
+      '571f': '士'
     }
+    const a = []
+    for (const i of e) {
+      var r = (function (e, t, a) {
+        for (; ('' + e).length < a; ) e = '' + t + e
+        return e
+      })(i.charCodeAt(0).toString(16), '0', 4)
+      r in t ? a.push(t[r]) : a.push(i)
+    }
+    e = a.join('')
+    var n = (function () {
+      let e =
+        document.querySelector('.display-language .text').innerText ||
+        window.navigator.userLanguage ||
+        window.navigator.language
+      return e ? (e = (e = e.toLowerCase()).split('-')[0]) : null
+    })()
+    return (e =
+      n && 'en' !== n
+        ? await p.exec('translate', { from: n, to: 'en', text: e })
+        : e)
   }
-  async function t (e) {
+  let f = null
+  async function e (e) {
     if ('block' === document.querySelector('div.check')?.style.display)
-      return (
-        r ||
-          (await f.exec('inc_cache', { name: 'hcaptcha_pass' }),
-          await _(),
-          (r = !0)),
-        void (e.debug && window.location.reload())
-      )
-    (r = !1),
-      await m.sleep(e.open_delay),
+      return (a = a || true), void (e.debug && window.location.reload())
+    ;(a = false),
+      await d.sleep(e.hcaptcha_open_delay),
       document.querySelector('#checkbox')?.click()
   }
-  async function a (e) {
-    y =
-      !(
-        y ||
-        !(function () {
-          const e = document.querySelector('.display-error')
-          return 'true' !== e?.getAttribute('aria-hidden')
-        })()
-      ) && (await f.exec('inc_cache', { name: 'hcaptcha_fail' }), await _(), !0)
-    c = 100
-    const { task: t, task_url: a, cells: r, urls: i } = await new Promise(l => {
-      let s = !1
-      const o = setInterval(() => {
+  async function t (e) {
+    o = !(
+      o ||
+      !(function () {
+        const e = document.querySelector('.display-error')
+        return 'true' !== e?.getAttribute('aria-hidden')
+      })()
+    )
+    n = 100
+    const { task: t, cells: a, urls: r } = await new Promise(o => {
+      let s = false
+      const l = setInterval(async () => {
         if (!s) {
-          s = !0
-          var e = document
-            .querySelector('h2.prompt-text')
-            ?.innerText?.replace(/\s+/g, ' ')
-            ?.trim()
+          s = true
+          var e = await y()
           if (e) {
             var t = document.querySelector(
                 '.challenge-example > .image > .image'
               ),
-              t = g(t)
+              t = u(t)
             if (t && '' !== t) {
               var a = document.querySelectorAll('.task-image')
-              if (9 !== a.length) s = !1
+              if (9 !== a.length) s = false
               else {
-                const i = [],
-                  c = []
-                for (const n of a) {
-                  var r = n.querySelector('div.image')
-                  if (!r) return void (s = !1)
-                  r = g(r)
-                  if (!r || '' === r) return void (s = !1)
-                  i.push(n), c.push(r)
+                const n = [],
+                  i = []
+                for (const c of a) {
+                  var r = c.querySelector('div.image')
+                  if (!r) return void (s = false)
+                  r = u(r)
+                  if (!r || '' === r) return void (s = false)
+                  n.push(c), i.push(r)
                 }
-                a = JSON.stringify(c)
-                if (p !== a)
+                a = JSON.stringify(i)
+                if (f !== a)
                   return (
-                    (p = a),
-                    clearInterval(o),
-                    (s = !1),
-                    l({ task: e, task_url: t, cells: i, urls: c })
+                    (f = a),
+                    clearInterval(l),
+                    (s = false),
+                    o({ task: e, task_url: t, cells: n, urls: i })
                   )
-                s = !1
+                s = false
               }
-            } else s = !1
-          } else s = !1
+            } else s = false
+          } else s = false
         }
-      }, c)
+      }, n)
     })
-    var c,
-      n = await h.encode(a)
-    const l = []
-    for (const u of i) l.push(await h.encode(u))
-    var s = m.time(),
-      o = (await w({ task: t, task_img: n, images: l }))['clicks']
-    if (o) {
-      n = e.solve_delay - (m.time() - s)
-      0 < n && (await m.sleep(n)), await m.random_sleep(...d)
-      for (let e = 0; e < o.length; e++)
-        !1 !== o[e] &&
-          'true' !== r[e].getAttribute('aria-pressed') &&
-          r[e].click()
-      await m.random_sleep(...d)
+    var n,
+      i = d.time(),
+      c = (
+        await g.post({
+          captcha_type: 'hcaptcha',
+          task: t,
+          image_urls: r,
+          key: e.key
+        })
+      )['clicks']
+    if (c) {
+      e = e.hcaptcha_solve_delay - (d.time() - i)
+      0 < e && (await d.sleep(e))
+      for (let e = 0; e < c.length; e++)
+        false !== c[e] &&
+          'true' !== a[e].getAttribute('aria-pressed') &&
+          a[e].click()
       try {
         document.querySelector('.button-submit').click()
       } catch (e) {}
     }
   }
-  let r = !1,
-    y = !1
+  let a = false,
+    o = false
   for (;;) {
-    await m.sleep(1e3)
-    var i = await f.exec('get_settings')
-    i &&
-      ((e.debug = i.debug),
-      i.auto_open && null !== document.querySelector('div.check')
-        ? await t(i)
-        : i.auto_solve &&
+    await d.sleep(1e3)
+    var r = await p.exec('get_settings')
+    r &&
+      (r.hcaptcha_auto_open && null !== document.querySelector('div.check')
+        ? await e(r)
+        : r.hcaptcha_auto_solve &&
           null !== document.querySelector('h2.prompt-text') &&
-          (await a(i)))
+          (await t(r)))
   }
 })()

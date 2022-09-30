@@ -1,28 +1,27 @@
-(async () => {
-  var {} = await import(chrome.runtime.getURL('utils.js'))
+;(async () => {
   let a = null,
-    t = !1,
-    r = !1
-  function n (e, t, r = !1) {
+    t = false,
+    r = false
+  function n (e, t, r = false) {
     e &&
       (r || a !== e) &&
-      ((!0 === t && 'false' === e.getAttribute('aria-pressed')) ||
-        (!1 === t && 'true' === e.getAttribute('aria-pressed'))) &&
+      ((true === t && 'false' === e.getAttribute('aria-pressed')) ||
+        (false === t && 'true' === e.getAttribute('aria-pressed'))) &&
       e.click()
   }
   document.addEventListener('mousedown', e => {
     'false' === e?.target?.parentNode?.getAttribute('aria-pressed')
-      ? ((t = !0), (r = !0))
+      ? ((t = true), (r = true))
       : 'true' === e?.target?.parentNode?.getAttribute('aria-pressed') &&
-        ((t = !0), (r = !1)),
+        ((t = true), (r = false)),
       (a = e?.target?.parentNode)
   }),
     document.addEventListener('mouseup', e => {
-      (t = !1), (a = null)
+      ;(t = false), (a = null)
     }),
     document.addEventListener('mousemove', e => {
       t &&
-        (a !== e?.target?.parentNode && null !== a && n(a, r, !0),
+        (a !== e?.target?.parentNode && null !== a && n(a, r, true),
         n(e?.target?.parentNode, r))
     })
 })()

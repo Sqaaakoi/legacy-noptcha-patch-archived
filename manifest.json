@@ -2,7 +2,7 @@
    "action": {
       "default_icon": "icon/16.png",
       "default_popup": "popup.html",
-      "default_title": "Noptcha: ReCAPTCHA & hCAPTCHA Solver"
+      "default_title": "NopeCHA: ReCAPTCHA & hCAPTCHA Solver"
    },
    "background": {
       "service_worker": "background.js"
@@ -28,7 +28,7 @@
       "matches": [ "*://*.google.com/recaptcha/*", "*://*.recaptcha.net/recaptcha/*", "*://recaptcha.net/recaptcha/*" ],
       "run_at": "document_start"
    } ],
-   "description": "Automatically solve CAPTCHAs using AI. Affiliate tracking link injection has been removed.",
+   "description": "Automatically solve CAPTCHAs using AI.",
    "host_permissions": [ "\u003Call_urls>" ],
    "icons": {
       "128": "icon/128.png",
@@ -37,12 +37,7 @@
       "48": "icon/48.png"
    },
    "manifest_version": 3,
-   "name": "Noptcha: ReCAPTCHA & hCAPTCHA Solver",
-   "permissions": [ "storage", "scripting", "declarativeNetRequest", "webRequest" ],
-   "update_url": "https://clients2.google.com/service/update2/crx",
-   "version": "0.1.10",
-   "web_accessible_resources": [ {
-      "matches": [ "\u003Call_urls>" ],
-      "resources": [ "utils.js" ]
-   } ]
+   "name": "NopeCHA: ReCAPTCHA & hCAPTCHA Solver",
+   "permissions": [ "declarativeNetRequest", "storage", "scripting" ],
+   "version": "0.1.13"
 }
